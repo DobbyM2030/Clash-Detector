@@ -6,6 +6,8 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 
 A standalone Python Flask project has been added at `artifacts/bim-clash-detection` for a BIM clash detection web app. It includes a Flask backend, HTML template, CSS theme, JavaScript upload/results behavior, IFC upload storage, and PDF report export support.
 
+The BIM clash detector now uses IfcOpenShell to load IFC geometry, generate model element bounding boxes, detect real geometric overlaps, and automatically ignore common intentional construction intersections: structural joints, pipe supports, rebar in concrete, door/window wall openings, and cable tray supports.
+
 ## Stack
 
 - **Monorepo tool**: pnpm workspaces
@@ -17,7 +19,7 @@ A standalone Python Flask project has been added at `artifacts/bim-clash-detecti
 - **Validation**: Zod (`zod/v4`), `drizzle-zod`
 - **API codegen**: Orval (from OpenAPI spec)
 - **Build**: esbuild (CJS bundle)
-- **BIM clash detection app**: Python Flask, HTML, CSS, JavaScript, ReportLab PDF export
+- **BIM clash detection app**: Python Flask, HTML, CSS, JavaScript, IfcOpenShell, ReportLab PDF export
 
 ## Key Commands
 
@@ -32,7 +34,7 @@ A standalone Python Flask project has been added at `artifacts/bim-clash-detecti
 ## BIM Clash Detection App Structure
 
 - `artifacts/bim-clash-detection/app.py` — Flask routes for dashboard, IFC upload, clash run lookup, and PDF export
-- `artifacts/bim-clash-detection/clash_detector.py` — IFC element parsing and clash result generation
+- `artifacts/bim-clash-detection/clash_detector.py` — IfcOpenShell geometry loading, overlap detection, severity classification, and smart ignore rules
 - `artifacts/bim-clash-detection/pdf_export.py` — PDF report generation
 - `artifacts/bim-clash-detection/templates/index.html` — dashboard markup
 - `artifacts/bim-clash-detection/static/css/styles.css` — professional dark blue and white styling
