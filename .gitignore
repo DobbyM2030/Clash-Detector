@@ -12,6 +12,21 @@ out-tsc
 node_modules
 .pythonlibs
 
+# Python
+__pycache__/
+*.pyc
+.env
+
+# uploaded/generated app files
+storage/uploads/*
+storage/exports/*
+artifacts/bim-clash-detection/storage/uploads/*
+artifacts/bim-clash-detection/storage/exports/*
+!storage/uploads/.gitkeep
+!storage/exports/.gitkeep
+!artifacts/bim-clash-detection/storage/uploads/.gitkeep
+!artifacts/bim-clash-detection/storage/exports/.gitkeep
+
 # IDEs and editors
 /.idea
 .project

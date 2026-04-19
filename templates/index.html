@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BIM Clash Detection</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-block">
+        <div class="brand-mark">BIM</div>
+        <div>
+          <p class="eyebrow">Coordination Suite</p>
+          <h1>Clash Detection</h1>
+        </div>
+      </div>
+
+      <section class="severity-panel" aria-label="Clash severity counts">
+        <div class="severity-card critical">
+          <span>Critical</span>
+          <strong id="criticalCount">0</strong>
+        </div>
+        <div class="severity-card warning">
+          <span>Warning</span>
+          <strong id="warningCount">0</strong>
+        </div>
+        <div class="severity-card info">
+          <span>Info</span>
+          <strong id="infoCount">0</strong>
+        </div>
+        <div class="severity-card ignored">
+          <span>Ignored</span>
+          <strong id="ignoredCount">0</strong>
+        </div>
+      </section>
+
+      <div class="sidebar-note">
+        <p>Upload an IFC model to generate a coordination report with severity, element pairing, and location details.</p>
+      </div>
+    </aside>
+
+    <main class="dashboard">
+      <header class="dashboard-header">
+        <div>
+          <p class="eyebrow">Model Review Dashboard</p>
+          <h2>IFC Clash Analysis</h2>
+        </div>
+        <button id="exportPdfButton" class="secondary-button" disabled>Export PDF</button>
+      </header>
+
+      <section class="upload-card">
+        <form id="uploadForm" class="upload-area">
+          <input id="ifcFileInput" name="ifcFile" type="file" accept=".ifc" hidden>
+          <label for="ifcFileInput" class="drop-zone" id="dropZone">
+            <span class="upload-icon">IFC</span>
+            <strong>Upload IFC file</strong>
+            <small>Drag and drop your model here, or browse from your computer.</small>
+          </label>
+          <button type="submit" class="primary-button">Run Clash Detection</button>
+        </form>
+        <div id="fileStatus" class="file-status">No IFC file selected.</div>
+      </section>
+
+      <section class="results-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Detected Issues</p>
+            <h3>Clash Results</h3>
+          </div>
+          <span id="resultCount" class="result-count">0 clashes</span>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Clash ID</th>
+                <th>Severity</th>
+                <th>Description</th>
+                <th>Location</th>
+                <th>Element A</th>
+                <th>Element B</th>
+              </tr>
+            </thead>
+            <tbody id="resultsBody">
+              <tr class="empty-row">
+                <td colspan="6">Upload an IFC file to view clash results.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="results-card ignored-review-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Smart Rules Audit</p>
+            <h3>Ignored Clashes Review</h3>
+          </div>
+          <span id="ignoredResultCount" class="result-count">0 ignored</span>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Ignore ID</th>
+                <th>Reason</th>
+                <th>Description</th>
+                <th>Location</th>
+                <th>Element A</th>
+                <th>Element B</th>
+              </tr>
+            </thead>
+            <tbody id="ignoredResultsBody">
+              <tr class="empty-row">
+                <td colspan="6">Ignored clashes will appear here after IFC analysis.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
