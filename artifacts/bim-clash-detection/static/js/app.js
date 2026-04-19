@@ -8,6 +8,9 @@ const exportPdfButton = document.getElementById("exportPdfButton");
 const criticalCount = document.getElementById("criticalCount");
 const warningCount = document.getElementById("warningCount");
 const infoCount = document.getElementById("infoCount");
+const ignoredCount = document.getElementById("ignoredCount");
+const ignoredResultsBody = document.getElementById("ignoredResultsBody");
+const ignoredResultCount = document.getElementById("ignoredResultCount");
 
 let activeRunId = null;
 
@@ -31,6 +34,15 @@ function severityClass(severity) {
   return severity.toLowerCase();
 }
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function renderResults(clashes) {
   resultCount.textContent = `${clashes.length} ${clashes.length === 1 ? "clash" : "clashes"}`;
   resultsBody.innerHTML = "";
@@ -43,14 +55,38 @@ function renderResults(clashes) {
   clashes.forEach((clash) => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td><strong>${clash.id}</strong></td>
-      <td><span class="severity-pill ${severityClass(clash.severity)}">${clash.severity}</span></td>
-      <td>${clash.description}</td>
-      <td>${clash.location}</td>
-      <td>${clash.elementA}</td>
-      <td>${clash.elementB}</td>
+      <td><strong>${escapeHtml(clash.id)}</strong></td>
+      <td><span class="severity-pill ${severityClass(clash.severity)}">${escapeHtml(clash.severity)}</span></td>
+      <td>${escapeHtml(clash.description)}</td>
+      <td>${escapeHtml(clash.location)}</td>
+      <td>${escapeHtml(clash.elementA)}</td>
+      <td>${escapeHtml(clash.elementB)}</td>
     `;
     resultsBody.appendChild(row);
+  });
+}
+
+function renderIgnoredResults(ignoredClashes) {
+  ignoredCount.textContent = ignoredClashes.length;
+  ignoredResultCount.textContent = `${ignoredClashes.length} ${ignoredClashes.length === 1 ? "ignored clash" : "ignored clashes"}`;
+  ignoredResultsBody.innerHTML = "";
+
+  if (ignoredClashes.length === 0) {
+    ignoredResultsBody.innerHTML = '<tr class="empty-row"><td colspan="6">No clashes were ignored by smart rules for this IFC model.</td></tr>';
+    return;
+  }
+
+  ignoredClashes.forEach((clash) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td><strong>${escapeHtml(clash.id)}</strong></td>
+      <td><span class="ignore-pill">${escapeHtml(clash.reason)}</span></td>
+      <td>${escapeHtml(clash.description)}</td>
+      <td>${escapeHtml(clash.location)}</td>
+      <td>${escapeHtml(clash.elementA)}</td>
+      <td>${escapeHtml(clash.elementB)}</td>
+    `;
+    ignoredResultsBody.appendChild(row);
   });
 }
 
@@ -129,6 +165,7 @@ uploadForm.addEventListener("submit", async (event) => {
     activeRunId = data.runId;
     updateSummary(data.summary);
     renderResults(data.clashes);
+    renderIgnoredResults(data.ignoredClashes || []);
     exportPdfButton.disabled = false;
     setStatus(`Analysis complete for ${data.filename}.`);
   } catch (error) {

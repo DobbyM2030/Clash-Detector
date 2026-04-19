@@ -125,6 +125,10 @@ input {
   color: #bae6fd;
 }
 
+.severity-card.ignored strong {
+  color: #bfdbfe;
+}
+
 .sidebar-note {
   margin-top: auto;
   padding: 20px;
@@ -163,6 +167,10 @@ input {
   border-radius: 28px;
   background: rgba(255, 255, 255, 0.88);
   box-shadow: var(--shadow);
+}
+
+.ignored-review-card {
+  margin-top: 26px;
 }
 
 .upload-card {
@@ -321,6 +329,18 @@ td {
 
 .severity-pill.info {
   background: var(--info);
+}
+
+.ignore-pill {
+  display: inline-flex;
+  align-items: center;
+  max-width: 220px;
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: var(--navy-900);
+  background: var(--blue-100);
+  font-size: 0.78rem;
+  font-weight: 800;
 }
 
 .empty-row td {

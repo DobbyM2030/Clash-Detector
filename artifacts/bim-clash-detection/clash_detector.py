@@ -1,7 +1,5 @@
 from dataclasses import dataclass
 from itertools import combinations
-from math import inf
-
 STRUCTURAL_TYPES = {
     "IfcBeam",
     "IfcColumn",
@@ -50,6 +48,7 @@ STRUCTURAL_JOINT_TYPES = {"IfcBeam", "IfcColumn", "IfcMember", "IfcPlate", "IfcS
 MIN_OVERLAP_TOLERANCE = 0.003
 MAX_ELEMENTS = 450
 MAX_CLASHES = 500
+MAX_IGNORED_CLASHES = 500
 
 
 @dataclass
@@ -320,6 +319,14 @@ def describe_clash(element_a, element_b, overlap_axes, overlap_volume):
     )
 
 
+def describe_ignored_clash(element_a, element_b, overlap_axes, overlap_volume):
+    overlap_mm = min(overlap_axes) * 1000
+    return (
+        f"Intentional or expected geometry relationship between {element_a.ifc_type} and {element_b.ifc_type}; "
+        f"overlap depth is {overlap_mm:.0f} mm with intersecting bounding volume {overlap_volume:.3f} m³."
+    )
+
+
 def sort_pair_priority(pair):
     element_a, element_b, overlap_axes, overlap_volume = pair
     severity_rank = {"Critical": 0, "Warning": 1, "Info": 2}
@@ -330,9 +337,15 @@ def sort_pair_priority(pair):
     )
 
 
+def sort_ignored_priority(pair):
+    element_a, element_b, overlap_axes, overlap_volume, reason = pair
+    return (reason, -overlap_volume, distance_between_centers(element_a, element_b))
+
+
 def detect_clashes(file_path):
     elements = load_geometry(file_path)
     candidate_pairs = []
+    ignored_pairs = []
 
     for element_a, element_b in combinations(elements, 2):
         overlap = bbox_overlap(element_a, element_b)
@@ -340,13 +353,17 @@ def detect_clashes(file_path):
             continue
 
         overlap_axes, overlap_volume = overlap
-        if ignore_reason(element_a, element_b, overlap_volume):
+        reason = ignore_reason(element_a, element_b, overlap_volume)
+        if reason:
+            ignored_pairs.append((element_a, element_b, overlap_axes, overlap_volume, reason))
             continue
 
         candidate_pairs.append((element_a, element_b, overlap_axes, overlap_volume))
 
     candidate_pairs.sort(key=sort_pair_priority)
+    ignored_pairs.sort(key=sort_ignored_priority)
     clashes = []
+    ignored_clashes = []
 
     for index, (element_a, element_b, overlap_axes, overlap_volume) in enumerate(candidate_pairs[:MAX_CLASHES], start=1):
         clashes.append(
@@ -360,7 +377,19 @@ def detect_clashes(file_path):
             }
         )
 
-    return clashes
+    for index, (element_a, element_b, overlap_axes, overlap_volume, reason) in enumerate(ignored_pairs[:MAX_IGNORED_CLASHES], start=1):
+        ignored_clashes.append(
+            {
+                "id": f"IG-{index:04d}",
+                "reason": reason,
+                "description": describe_ignored_clash(element_a, element_b, overlap_axes, overlap_volume),
+                "location": format_location(element_a, element_b),
+                "elementA": element_label(element_a),
+                "elementB": element_label(element_b),
+            }
+        )
+
+    return {"clashes": clashes, "ignoredClashes": ignored_clashes}
 
 
 def summarize_clashes(clashes):

@@ -48,10 +48,12 @@ def upload_ifc_file():
     uploaded_file.save(file_path)
 
     try:
-        clashes = detect_clashes(file_path)
+        analysis = detect_clashes(file_path)
     except Exception as error:
         return jsonify({"error": f"IFC geometry analysis failed: {error}"}), 422
 
+    clashes = analysis["clashes"]
+    ignored_clashes = analysis["ignoredClashes"]
     summary = summarize_clashes(clashes)
 
     CLASH_RUNS[run_id] = {
@@ -60,6 +62,7 @@ def upload_ifc_file():
         "filePath": str(file_path),
         "summary": summary,
         "clashes": clashes,
+        "ignoredClashes": ignored_clashes,
     }
 
     return jsonify(CLASH_RUNS[run_id])
