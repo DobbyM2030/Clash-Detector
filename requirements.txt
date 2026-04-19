@@ -1,4 +1,5 @@
 Flask==3.0.3
 Werkzeug==3.0.3
 reportlab==4.2.2
-ifcopenshell @ https://github.com/IfcOpenShell/ifcopenshell-python/releases/download/ifcopenshell-python-0.7.0/ifcopenshell-python-0.7.0-cp311-cp311-linux_x86_64.zip
+numpy==1.26.4
+ifcopenshell==0.7.0.240521
